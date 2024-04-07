@@ -5,9 +5,9 @@ class TestGoban(unittest.TestCase):
 
     def test_basics(self):
         board = Goban(5, 5)
-        self.assertEqual(board.state([0, 0]), 0)
+        self.assertEqual(board.get([0, 0]), 0)
         board.set([0, 0], 1)
-        self.assertEqual(board.state([0, 0]), 1)
+        self.assertEqual(board.get([0, 0]), 1)
         print(board.to_s())
 
     def test_find_dead_string_simple(self):
@@ -61,6 +61,8 @@ class TestGoban(unittest.TestCase):
             board.play_move(m, turn)
             print("\n" + board.to_s())
             turn = board.other_color(turn)
+
+        self.assertEqual(board.get([0,0]), 0)
 
 if __name__ == '__main__':
     unittest.main()

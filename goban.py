@@ -6,7 +6,7 @@ class Goban:
         self.height = height
         self.boardstate = array('B', bytes(width*height))
 
-    def state(self, point):
+    def get(self, point):
         return self.boardstate[self.point2index(point)]
 
     def point2index(self, point):
@@ -32,7 +32,7 @@ class Goban:
     def to_s(self):
         s = ""
         for y in range(self.height):
-            row_chars = (self.board_char(self.state([x, y])) for x in range(self.width))
+            row_chars = (self.board_char(self.get([x, y])) for x in range(self.width))
             s += " ".join(row_chars) + "\n"
         return s
 
@@ -61,7 +61,7 @@ class Goban:
                 new_p = self.move_point(p, dir)
                 if None == new_p:
                     continue
-                state = self.state(new_p)
+                state = self.get(new_p)
                 if 0 == state:
                     return None
                 if color == state:
