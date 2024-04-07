@@ -52,5 +52,15 @@ class TestGoban(unittest.TestCase):
         self.assertEqual([[2,2],[3,2],[1,2],[2,1],[2,3]].sort(), result.sort())
         print("\n" + board.to_s())
 
+    def test_play_move(self):
+        board = Goban(5, 5)
+
+        turn = 1
+        for m in [[0,0], [1,0], [0,1], [1,1], [0,2], [1,2],
+                  [0,3], [1,3], [0,4], [1,4]]:
+            board.play_move(m, turn)
+            print("\n" + board.to_s())
+            turn = board.other_color(turn)
+
 if __name__ == '__main__':
     unittest.main()

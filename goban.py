@@ -46,7 +46,7 @@ class Goban:
             p[0] -= 1
         elif dir == 3:
             p[1] -= 1
-        if p[0] < 0 or p[0] > self.width or p[1] < 0 or p[1] > self.height:
+        if p[0] < 0 or p[0] >= self.width or p[1] < 0 or p[1] >= self.height:
             return None
         return p
 
@@ -70,3 +70,34 @@ class Goban:
                         points_to_search.append(new_p)
 
         return points
+
+    def is_legal_move(self, point, color):
+        # no suicide
+        if self.find_dead_string(color, [point], [point]):
+            return False
+
+        # TODO: repetition
+
+        return True
+
+    def other_color(self, color):
+        if color == 1:
+            return 2
+        elif color == 2:
+            return 1
+        return 0
+
+    def play_move(self, point, color):
+        if not self.is_legal_move(point, color):
+            raise ValueError(point)
+        self.set(point, color)
+        for dir in range(4):
+            new_p = self.move_point(point, dir)
+            if None == new_p:
+                continue
+
+            string = self.find_dead_string(self.other_color(color), [new_p], [new_p])
+            if string:
+                # dead!
+                for p in string:
+                    self.set(p, 0)
