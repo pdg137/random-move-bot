@@ -1,7 +1,7 @@
 import sys
 import random
+from goban import Goban
 
-boardsize = None
 board = None
 komi = 0
 handicap = 0
@@ -10,20 +10,12 @@ def debug(str):
     sys.stderr.write(str)
     sys.stderr.write("\n")
 
-def board_char(a):
-    if a == 2:
-        return "o"
-    if a == 1:
-        return "x"
-    return "."
-
 def debug_board(board):
-    # rows are backwards
-    for row in range(len(board)-1,-1,-1):
-        board_row = board[row]
-        sys.stderr.write(f"{' '.join(board_char(a) for a in board_row)}\n")
+    sys.stderr.write(board.to_s())
 
 def parsemove(move):
+    if None == move:
+        return None
     row = int(move[1])-1
     if move[0] > "i": # skip i
         col = ord(move[0]) - ord("a") - 1
@@ -46,17 +38,18 @@ def random_move(board, color):
     col = None
     row = None
     for i in range(1000):
-        col = random.randrange(boardsize[0])
-        row = random.randrange(boardsize[1])
-        if 0 == board[row][col]:
+        col = random.randrange(board.width)
+        row = random.randrange(board.height)
+        if board.is_legal_move([col, row], color):
             break
     return [col, row]
 
 def play_moves(board, color, moves):
     move_string = " ".join(format_move(m[0], m[1]) for m in moves)
     print(f"= {move_string}\n")
+    debug(f"playing {move_string} as {color}")
     for m in moves:
-        board[m[1]][m[0]] = color
+        board.play_move(m, color)
 
 while True:
     line = input().strip().split(" ")
@@ -207,13 +200,12 @@ worm_data
 worm_stones
 """)
         case "boardsize":
-            boardsize = [int(args[0]), int(args[0])]
-            board = [[0 for i in range(boardsize[0])] for j in range(boardsize[1])]
+            board = Goban(int(args[0]), int(args[0]))
 
             print("= \n\n")
 
         case "clear_board":
-            # TODO: clear board
+            board = Goban(board.width, board.height)
             print("= \n")
         case "komi":
             komi = float(args[0])
@@ -221,7 +213,7 @@ worm_stones
         case "set_free_handicap":
             for move in args:
                 (row, col) = parsemove(move)
-                board[row][col] = 1
+                board.play_move([col, row], 1)
                 handicap += 1
             print("= \n")
         case "place_free_handicap":
@@ -239,8 +231,9 @@ worm_stones
                 color = 2
             else:
                 color = 1
-            (row, col) = parsemove(args[1])
-            board[row][col] = color
+            if args[1] != "pass":
+                (row, col) = parsemove(args[1])
+                board.play_move([col, row], color)
             print("= \n")
         case "genmove":
             if args[0] == "white":

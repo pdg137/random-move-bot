@@ -36,7 +36,7 @@ class TestGoban(unittest.TestCase):
         self.assertEqual([[0,0], [1,0]], result)
         print("\n", board.to_s())
 
-    def test_find_dead_string_larger(self):
+    def test_find_dead_string_larger2(self):
         board = Goban(5, 5)
 
         for p in [[2,2],[3,2],[1,2],[2,1],[2,3]]:
@@ -91,6 +91,14 @@ class TestGoban(unittest.TestCase):
 
         self.assertEqual(True, board.is_legal_move([2,0], turn))
 
+    def test_suicide(self):
+        board = Goban(5, 5)
+        for m in [[2,0], [2,1], [1,2], [0,3]]:
+            board.play_move(m, 1)
+        for m in [[0,0], [0,1], [0,2], [1,1]]:
+            board.play_move(m, 2)
+        print("\n" + board.to_s())
+        self.assertEqual(False, board.is_legal_move([1,0], 2))
 
 if __name__ == '__main__':
     unittest.main()

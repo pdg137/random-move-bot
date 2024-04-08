@@ -1,4 +1,5 @@
 from array import array
+import sys
 
 class Goban:
     def __init__(self, width, height):
@@ -24,11 +25,6 @@ class Goban:
         y = point[1]
         return x + self.width * y
 
-#    def index2point(self, index):
-#        x = index % self.width
-#        y = index // self.width
-#        return [x, y]
-
     def set(self, point, color, boardstate = None):
         if None == boardstate:
             boardstate = self.boardstate
@@ -43,7 +39,7 @@ class Goban:
 
     def to_s(self):
         s = ""
-        for y in range(self.height):
+        for y in range(self.height-1,-1,-1):
             row_chars = (self.board_char(self.get([x, y])) for x in range(self.width))
             s += " ".join(row_chars) + "\n"
         return s
@@ -93,24 +89,18 @@ class Goban:
         return points
 
     def is_legal_move(self, point, color):
-        # no repetition
         tmp_boardstate = array('B', self.boardstate)
+
+        if 0 != self.get(point, tmp_boardstate):
+            # occupied
+            return False
+
+        # no repetition
         self.apply_move_to_board(point, color, tmp_boardstate)
         if self.previous_position_exists(tmp_boardstate):
             return False
-
-        for dir in range(4):
-            new_p = self.move_point(point, dir)
-            if None == new_p:
-                continue
-
-            string = self.find_dead_string(self.other_color(color), [point, new_p], [new_p])
-            if string:
-                # if you kill a group, it's always legal
-                return True
-
-        # no suicide
-        if self.find_dead_string(color, [point], [point]):
+        if 0 == self.get(point, tmp_boardstate):
+            # suicide
             return False
 
         return True
@@ -130,7 +120,7 @@ class Goban:
                 continue
 
             # assume it's not suicide, nothing to check
-            if color == new_p:
+            if color == self.get(new_p, boardstate):
                 continue
 
             string = self.find_dead_string(self.other_color(color), [new_p], [new_p], boardstate)
@@ -138,6 +128,12 @@ class Goban:
                 # dead!
                 for p in string:
                     self.set(p, 0, boardstate)
+
+        string = self.find_dead_string(color, [point], [point], boardstate)
+        if string:
+            # dead!
+            for p in string:
+                self.set(p, 0, boardstate)
 
     def play_move(self, point, color):
         if not self.is_legal_move(point, color):
