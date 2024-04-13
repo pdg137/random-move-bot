@@ -20,41 +20,41 @@ class TestGoGame(unittest.TestCase):
 
         self.assertEqual(game.goban.get([0,0]), 0)
 
-    # def test_ko(self):
-    #     board = GoGame(5, 5)
+    def test_ko(self):
+        game = GoGame(5, 5)
 
-    #     turn = 1
-    #     for m in [[0,0], [3,0],
-    #               [1,1], [2,1],
-    #               [2,0]]:
-    #         board.play_move(m, turn)
-    #         print("\n" + board.to_s())
-    #         turn = board.other_color(turn)
+        turn = 1
+        for m in [[0,0], [3,0],
+                  [1,1], [2,1],
+                  [2,0]]:
+            game.play_move(m, turn)
+            print("\n" + game.to_s())
+            turn = game.other_color(turn)
 
-    #     self.assertEqual(board.get([2,0]), 1)
-    #     self.assertEqual(True, board.is_legal_move([1,0], turn))
+        self.assertEqual(game.goban.get([2,0]), 1)
+        self.assertEqual(True, game.is_legal_move([1,0], turn))
 
-    #     board.play_move([1,0], turn)
-    #     print("\n" + board.to_s())
-    #     turn = board.other_color(turn)
-    #     self.assertEqual(False, board.is_legal_move([2,0], turn))
+        game.play_move([1,0], turn)
+        print("\n" + game.to_s())
+        turn = game.other_color(turn)
+        self.assertEqual(False, game.is_legal_move([2,0], turn))
 
-    #     # fake ko threat
-    #     for m in [[3,4], [4,4]]:
-    #         board.play_move(m, turn)
-    #         print("\n" + board.to_s())
-    #         turn = board.other_color(turn)
+        # fake ko threat
+        for m in [[3,4], [4,4]]:
+            game.play_move(m, turn)
+            print("\n" + game.to_s())
+            turn = game.other_color(turn)
 
-    #     self.assertEqual(True, board.is_legal_move([2,0], turn))
+        self.assertEqual(True, game.is_legal_move([2,0], turn))
 
-    # def test_suicide(self):
-    #     board = GoGame(5, 5)
-    #     for m in [[2,0], [2,1], [1,2], [0,3]]:
-    #         board.play_move(m, 1)
-    #     for m in [[0,0], [0,1], [0,2], [1,1]]:
-    #         board.play_move(m, 2)
-    #     print("\n" + board.to_s())
-    #     self.assertEqual(False, board.is_legal_move([1,0], 2))
+    def test_suicide(self):
+        game = GoGame(5, 5)
+        for m in [[2,0], [2,1], [1,2], [0,3]]:
+            game.play_move(m, 1)
+        for m in [[0,0], [0,1], [0,2], [1,1]]:
+            game.play_move(m, 2)
+        print("\n" + game.to_s())
+        self.assertEqual(False, game.is_legal_move([1,0], 2))
 
 if __name__ == '__main__':
     unittest.main()

@@ -18,6 +18,9 @@ class GoGame:
     def previous_position_exists(self, test_goban):
         return self.previous_positions.count(test_goban)
 
+    def __repr__(self):
+        return self.to_s()
+
     def to_s(self):
         return self.goban.to_s()
 
@@ -71,7 +74,7 @@ class GoGame:
 
     def play_move(self, point, color):
         if not self.is_legal_move(point, color):
-            raise ValueError(point)
+            raise ValueError([self.goban.to_s(), point])
 
         self.goban = self.apply_move_to_board(point, color)
 

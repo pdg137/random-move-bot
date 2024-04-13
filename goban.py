@@ -18,6 +18,12 @@ class Goban:
             boardstate = array('B', bytes(width*height))
         self.boardstate = boardstate
 
+    def __repr__(self):
+        return self.to_s()
+
+    def __eq__(self, other):
+        return self.boardstate == other.boardstate
+
     def _point2index(self, point):
         x = point[0]
         y = point[1]

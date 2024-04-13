@@ -6,8 +6,10 @@ class TestGoGame(unittest.TestCase):
     def test_basics(self):
         board = Goban(5,5)
         self.assertEqual(board.get([0, 0]), 0)
-        board = board.set([0, 0], 1)
-        self.assertEqual(board.get([0, 0]), 1)
+        board2 = board.set([0, 0], 1)
+        self.assertEqual(board2.get([0, 0]), 1)
+        board3 = board.set([0, 0], 1)
+        self.assertEqual(board2, board3)
         print(board.to_s())
 
     def test_find_dead_string_simple(self):

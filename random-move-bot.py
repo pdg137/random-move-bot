@@ -1,8 +1,8 @@
 import sys
 import random
-from goban import Goban
+from go_game import GoGame
 
-board = None
+game = None
 komi = 0
 handicap = 0
 
@@ -10,18 +10,18 @@ def debug(str):
     sys.stderr.write(str)
     sys.stderr.write("\n")
 
-def debug_board(board):
-    sys.stderr.write(board.to_s())
+def debug_board(game):
+    sys.stderr.write(game.to_s())
 
 def parsemove(move):
     if None == move:
         return None
-    row = int(move[1])-1
+    row = int(move[1:])-1
     if move[0] > "i": # skip i
         col = ord(move[0]) - ord("a") - 1
     else:
         col = ord(move[0]) - ord("a")
-    return [row, col]
+    return [col, row]
 
 def format_move(col, row):
     if col == None:
@@ -34,22 +34,22 @@ def format_move(col, row):
         c = chr(ord("a") + col)
     return c + r
 
-def random_move(board, color):
+def random_move(game, color):
     col = None
     row = None
     for i in range(1000):
-        col = random.randrange(board.width)
-        row = random.randrange(board.height)
-        if board.is_legal_move([col, row], color):
+        col = random.randrange(game.goban.width)
+        row = random.randrange(game.goban.height)
+        if game.is_legal_move([col, row], color):
             break
     return [col, row]
 
-def play_moves(board, color, moves):
+def play_moves(game, color, moves):
     move_string = " ".join(format_move(m[0], m[1]) for m in moves)
     print(f"= {move_string}\n")
     debug(f"playing {move_string} as {color}")
     for m in moves:
-        board.play_move(m, color)
+        game.play_move(m, color)
 
 while True:
     line = input().strip().split(" ")
@@ -200,53 +200,58 @@ worm_data
 worm_stones
 """)
         case "boardsize":
-            board = Goban(int(args[0]), int(args[0]))
+            game = GoGame(int(args[0]), int(args[0]))
 
             print("= \n\n")
 
         case "clear_board":
-            board = Goban(board.width, board.height)
+            game = GoGame(game.goban.width, game.goban.height)
             print("= \n")
         case "komi":
             komi = float(args[0])
             print("= \n")
         case "set_free_handicap":
             for move in args:
-                (row, col) = parsemove(move)
-                board.play_move([col, row], 1)
+                (col, row) = parsemove(move)
+                debug(f"playing {row}, {col} as 1")
+                if game.goban.get([col, row]) != 0:
+                    debug(f"WARNING: duplicate handicap move {move}")
+                    continue
+                game.play_move([col, row], 1)
                 handicap += 1
             print("= \n")
+            debug_board(game)
         case "place_free_handicap":
             handicap = int(args[0])
             moves = []
             for i in range(handicap):
                 for j in range(1000):
-                    move = random_move(board, 1)
+                    move = random_move(game, 1)
                     if 0 == moves.count(move):
                         break
                 moves.append(move)
-            play_moves(board, 1, moves)
+            play_moves(game, 1, moves)
         case "play":
             if args[0] == "white":
                 color = 2
             else:
                 color = 1
             if args[1] != "pass":
-                (row, col) = parsemove(args[1])
-                board.play_move([col, row], color)
+                (col, row) = parsemove(args[1])
+                game.play_move([col, row], color)
             print("= \n")
         case "genmove":
             if args[0] == "white":
                 color = 2
             else:
                 color = 1
-            move = random_move(board, color)
-            play_moves(board, color, [move])
+            move = random_move(game, color)
+            play_moves(game, color, [move])
         case "quit":
             quit()
         case _:
             debug("UNKNOWN COMMAND")
 
-    if board:
+    if game:
         nl = "\n"
-        debug_board(board)
+        debug_board(game)
