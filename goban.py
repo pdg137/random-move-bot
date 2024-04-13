@@ -44,7 +44,10 @@ class Goban:
         return p
 
     def get(self, point):
-        return self.boardstate[self._point2index(point)]
+        index = self._point2index(point)
+        if index >= len(self.boardstate):
+            raise ValueError([point, index, len(self.boardstate)])
+        return self.boardstate[index]
 
     def set(self, point, color):
         new_boardstate = array('B', self.boardstate)

@@ -200,7 +200,12 @@ worm_data
 worm_stones
 """)
         case "boardsize":
-            game = GoGame(int(args[0]), int(args[0]))
+            width = int(args[0])
+            if len(args) > 1:
+                height = int(args[1])
+            else:
+                height = width
+            game = GoGame(width, height)
 
             print("= \n\n")
 
@@ -213,7 +218,10 @@ worm_stones
         case "set_free_handicap":
             for move in args:
                 (col, row) = parsemove(move)
-                debug(f"playing {row}, {col} as 1")
+                debug(f"playing {move} = [{col}, {row}] as 1")
+                if col >= game.goban.width or row >= game.goban.height:
+                    debug(f"WARNING: illegal handicap move {move}")
+                    continue
                 if game.goban.get([col, row]) != 0:
                     debug(f"WARNING: duplicate handicap move {move}")
                     continue
