@@ -2,47 +2,26 @@ from array import array
 import sys
 
 class Goban:
-    def __init__(self, width, height):
+    """
+    A class representing a go board and stones.
+
+    Immutable.
+
+    Methods include setting and getting the state as well as checking
+    for dead strings.
+    """
+
+    def __init__(self, width, height, boardstate = None):
         self.width = width
         self.height = height
-        self.boardstate = array('B', bytes(width*height))
-        self.previous_positions = []
-        self.record_position()
+        if boardstate == None:
+            boardstate = array('B', bytes(width*height))
+        self.boardstate = boardstate
 
-    def record_position(self):
-        self.previous_positions.append(array('B', self.boardstate))
-
-    def previous_position_exists(self, test_boardstate):
-        return self.previous_positions.count(test_boardstate)
-
-    def get(self, point, boardstate = None):
-        if None == boardstate:
-            boardstate = self.boardstate
-        return boardstate[self.point2index(point)]
-
-    def point2index(self, point):
+    def _point2index(self, point):
         x = point[0]
         y = point[1]
         return x + self.width * y
-
-    def set(self, point, color, boardstate = None):
-        if None == boardstate:
-            boardstate = self.boardstate
-        boardstate[self.point2index(point)] = color
-
-    def board_char(self, a):
-        if a == 2:
-            return "o"
-        if a == 1:
-            return "x"
-        return "."
-
-    def to_s(self):
-        s = ""
-        for y in range(self.height-1,-1,-1):
-            row_chars = (self.board_char(self.get([x, y])) for x in range(self.width))
-            s += " ".join(row_chars) + "\n"
-        return s
 
     def move_point(self, p, dir):
         p = p.copy()
@@ -58,9 +37,36 @@ class Goban:
             return None
         return p
 
-    def find_dead_string(self, color, points, points_to_search, boardstate = None):
-        if None == boardstate:
-            boardstate = self.boardstate
+    def get(self, point):
+        return self.boardstate[self._point2index(point)]
+
+    def set(self, point, color):
+        new_boardstate = array('B', self.boardstate)
+        new_boardstate[self._point2index(point)] = color
+        return Goban(self.width, self.height, new_boardstate)
+
+    def board_char(self, a):
+        if a == 2:
+            return "o"
+        if a == 1:
+            return "x"
+        return "."
+
+    def to_s(self):
+        s = ""
+        for y in range(self.height-1,-1,-1):
+            row_chars = (self.board_char(self.get([x, y])) for x in range(self.width))
+            s += " ".join(row_chars) + "\n"
+        return s
+
+    def find_dead_string(self, color, points, points_to_search):
+        """
+        Searches for a dead string of color *color*.
+
+        * *points*: the points found in the string already
+        * *points_to_search*: points whose neighbors still need to be
+          searched
+        """
 
         # avoid mutation
         points = points.copy()
@@ -72,7 +78,7 @@ class Goban:
                 new_p = self.move_point(p, dir)
                 if None == new_p:
                     continue
-                state = self.get(new_p, boardstate)
+                state = self.get(new_p)
 
                 # Skip points already in the string.
                 # Important to do that here since for testing captures we
@@ -87,58 +93,3 @@ class Goban:
                     points_to_search.append(new_p)
 
         return points
-
-    def is_legal_move(self, point, color):
-        tmp_boardstate = array('B', self.boardstate)
-
-        if 0 != self.get(point, tmp_boardstate):
-            # occupied
-            return False
-
-        # no repetition
-        self.apply_move_to_board(point, color, tmp_boardstate)
-        if self.previous_position_exists(tmp_boardstate):
-            return False
-        if 0 == self.get(point, tmp_boardstate):
-            # suicide
-            return False
-
-        return True
-
-    def other_color(self, color):
-        if color == 1:
-            return 2
-        elif color == 2:
-            return 1
-        return 0
-
-    def apply_move_to_board(self, point, color, boardstate):
-        self.set(point, color, boardstate)
-        for dir in range(4):
-            new_p = self.move_point(point, dir)
-            if None == new_p:
-                continue
-
-            # assume it's not suicide, nothing to check
-            if color == self.get(new_p, boardstate):
-                continue
-
-            string = self.find_dead_string(self.other_color(color), [new_p], [new_p], boardstate)
-            if string:
-                # dead!
-                for p in string:
-                    self.set(p, 0, boardstate)
-
-        string = self.find_dead_string(color, [point], [point], boardstate)
-        if string:
-            # dead!
-            for p in string:
-                self.set(p, 0, boardstate)
-
-    def play_move(self, point, color):
-        if not self.is_legal_move(point, color):
-            raise ValueError(point)
-
-        self.apply_move_to_board(point, color, self.boardstate)
-
-        self.record_position()
