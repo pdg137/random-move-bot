@@ -19,7 +19,7 @@ class GtpBot:
         self.genmove = genmove
 
     def _debug_board(self):
-        sys.stderr.write(self.game.to_s())
+        sys.stderr.write(str(self.game))
 
     def _parsemove(self, move):
         if None == move:
