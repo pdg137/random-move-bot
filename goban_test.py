@@ -1,7 +1,7 @@
 import unittest
 from goban import Goban
 
-class TestGoGame(unittest.TestCase):
+class TestGoban(unittest.TestCase):
 
     def test_basics(self):
         board = Goban(5,5)
@@ -10,7 +10,7 @@ class TestGoGame(unittest.TestCase):
         self.assertEqual(board2.get([0, 0]), 1)
         board3 = board.set([0, 0], 1)
         self.assertEqual(board2, board3)
-        print(board.to_s())
+        print(str(board))
 
     def test_find_dead_string_simple(self):
         board = Goban(5, 5).set([0, 0], 1)
@@ -27,12 +27,12 @@ class TestGoGame(unittest.TestCase):
         board = Goban(5, 5).set([0, 0], 1).set([1, 0], 1).set([0, 1], 2)
         result = board.find_dead_string(1,[[0,0]], [[0,0]])
         self.assertEqual(None, result)
-        print("\n" + board.to_s())
+        print(f"\n{board}")
 
         board = board.set([1, 1], 2).set([2, 0], 2)
         result = board.find_dead_string(1,[[0,0]], [[0,0]])
         self.assertEqual([[0,0], [1,0]], result)
-        print("\n", board.to_s())
+        print(f"\n{board}")
 
     def test_find_dead_string_larger2(self):
         board = Goban(5, 5)
@@ -43,12 +43,12 @@ class TestGoGame(unittest.TestCase):
             board = board.set(p, 2)
         result = board.find_dead_string(1,[[2,2]], [[2,2]])
         self.assertEqual(None, result)
-        print("\n" + board.to_s())
+        print(f"\n{board}")
 
         board = board.set([3,1], 2)
         result = board.find_dead_string(1,[[2,2]], [[2,2]])
         self.assertEqual([[2,2],[3,2],[1,2],[2,1],[2,3]].sort(), result.sort())
-        print("\n" + board.to_s())
+        print(f"\n{board}")
 
 if __name__ == '__main__':
     unittest.main()

@@ -19,10 +19,7 @@ class GoGame:
         return self.previous_positions.count(test_goban)
 
     def __repr__(self):
-        return self.to_s()
-
-    def to_s(self):
-        return self.goban.to_s()
+        return str(self.goban)
 
     def is_legal_move(self, point, color):
         if 0 != self.goban.get(point):
@@ -53,6 +50,10 @@ class GoGame:
             if None == new_p:
                 continue
 
+            # can't be dead if it's empty
+            if 0 == new_goban.get(new_p):
+                continue
+
             # handle suicide later
             if color == new_goban.get(new_p):
                 continue
@@ -74,7 +75,7 @@ class GoGame:
 
     def play_move(self, point, color):
         if not self.is_legal_move(point, color):
-            raise ValueError([self.goban.to_s(), point])
+            raise ValueError([str(self.goban), point])
 
         self.goban = self.apply_move_to_board(point, color)
 

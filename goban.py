@@ -19,7 +19,11 @@ class Goban:
         self.boardstate = boardstate
 
     def __repr__(self):
-        return self.to_s()
+        s = ""
+        for y in range(self.height-1,-1,-1):
+            row_chars = (self.board_char(self.get([x, y])) for x in range(self.width))
+            s += " ".join(row_chars) + "\n"
+        return s
 
     def __eq__(self, other):
         return self.boardstate == other.boardstate
@@ -60,13 +64,6 @@ class Goban:
         if a == 1:
             return "x"
         return "."
-
-    def to_s(self):
-        s = ""
-        for y in range(self.height-1,-1,-1):
-            row_chars = (self.board_char(self.get([x, y])) for x in range(self.width))
-            s += " ".join(row_chars) + "\n"
-        return s
 
     def find_dead_string(self, color, points, points_to_search):
         """
