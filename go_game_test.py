@@ -1,4 +1,5 @@
 import unittest
+import random
 from go_game import GoGame
 
 class TestGoGame(unittest.TestCase):
@@ -19,6 +20,20 @@ class TestGoGame(unittest.TestCase):
             turn = game.other_color(turn)
 
         self.assertEqual(game.goban.get([0,0]), 0)
+
+    def test_play_lots_of_moves(self):
+        size = 9
+        game = GoGame(size, size)
+        color = 1
+        print("Playing random game...")
+        for i in range(1000):
+            col = random.randrange(game.goban.width)
+            row = random.randrange(game.goban.height)
+            if game.is_legal_move([col, row], color):
+                game.play_move([col, row], color)
+                color = game.other_color(color)
+                print(f"\n{game}")
+        print("Done.")
 
     def test_ko(self):
         game = GoGame(5, 5)
@@ -55,6 +70,11 @@ class TestGoGame(unittest.TestCase):
             game.play_move(m, 2)
         print(f"\n{game}")
         self.assertEqual(False, game.is_legal_move([1,0], 2))
+
+    def test_pass(self):
+        game = GoGame(5, 5)
+        self.assertEqual(True, game.is_legal_move([None,None], 1))
+        game.play_move([None,None], 2)
 
     def test_bad_case(self):
         game = GoGame(5, 5)

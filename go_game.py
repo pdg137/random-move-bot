@@ -21,7 +21,12 @@ class GoGame:
     def __repr__(self):
         return str(self.goban)
 
+    pass_move = [None, None]
+
     def is_legal_move(self, point, color):
+        if point == self.pass_move:
+            return True
+
         if 0 != self.goban.get(point):
             # occupied
             return False
@@ -44,7 +49,11 @@ class GoGame:
         return 0
 
     def apply_move_to_board(self, point, color):
+        if point == [None,None]:
+            return self.goban.make_pass()
+
         new_goban = self.goban.set(point, color)
+
         for dir in range(4):
             new_p = new_goban.move_point(point, dir)
             if None == new_p:

@@ -5,7 +5,7 @@ def genmove(game, color):
     for i in range(1000):
         col = random.randrange(game.goban.width)
         row = random.randrange(game.goban.height)
-        if bot.game.is_legal_move([col, row], color):
+        if game.is_legal_move([col, row], color):
             return [col, row]
     return [None, None]
 

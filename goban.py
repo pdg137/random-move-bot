@@ -56,6 +56,11 @@ class Goban:
     def set(self, point, color):
         new_boardstate = array('B', self.boardstate)
         new_boardstate[self._point2index(point)] = color
+
+        return Goban(self.width, self.height, new_boardstate)
+
+    def make_pass(self):
+        new_boardstate = array('B', self.boardstate)
         return Goban(self.width, self.height, new_boardstate)
 
     def board_char(self, a):

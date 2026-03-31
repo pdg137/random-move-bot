@@ -50,7 +50,11 @@ class GtpBot:
 
     def run(self):
         while True:
-            line = input().strip().split(" ")
+            try:
+                line = input().strip().split(" ")
+            except EOFError:
+                exit()
+
             cmd = line[0]
             args = line[1:]
             self._process_command(cmd, args)
